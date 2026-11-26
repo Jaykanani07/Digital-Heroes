@@ -88,56 +88,16 @@ cd ../frontend
 npm install
 ```
 
-### 3. Configure Environment Variables
-
-Copy `backend/.env.example` to `backend/.env`:
-```env
-NODE_ENV=development
-PORT=4000
-FRONTEND_URL=http://localhost:3000
-
-DATABASE_URL=postgresql://postgres.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres
-SUPABASE_URL=https://<project-ref>.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=<your-service-role-or-secret-key>
-STORAGE_BUCKET=print-files
-
-JWT_SECRET=<64-char-random-hex>
-GOOGLE_CLIENT_ID=<your-google-oauth-client-id>
-
-STRIPE_SECRET_KEY=<sk_test_...>
-STRIPE_WEBHOOK_SECRET=<whsec_...>
-
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=<your-email>
-SMTP_PASS=<your-app-password>
-MAIL_FROM=Digital Heroes <your-email>
-ADMIN_NOTIFY_EMAIL=<studio-inbox-email>
-
-VAT_RATE=0.18
-CURRENCY=INR
-
-ADMIN_EMAIL=admin@digitalheroes.co.in
-ADMIN_PASSWORD=ChangeMe123!
-ADMIN_NAME=Studio Admin
-```
-
-Copy `frontend/.env.example` to `frontend/.env.local`:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:4000
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=<your-google-oauth-client-id>
-```
-
-### 4. Migrate, Seed & Create Admin
+### 3. Migrate, Seed & Create Admin
 From `backend/`:
 ```powershell
 npm run db:setup
 npm run create-admin
 ```
 - `npm run db:setup` applies `supabase/schema.sql` (15 tables) and seeds 6 divisions, 9 products, discount tiers, templates, and 16 rendered gallery images into Supabase Storage.
-- `npm run create-admin` creates or resets the admin user from `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
+- `npm run create-admin` creates or resets the studio administrator account.
 
-### 5. Run Locally
+### 4. Run Locally
 ```powershell
 # Terminal 1 — API (http://localhost:4000)
 cd backend
@@ -171,6 +131,5 @@ npm run dev
 ## Deployment (Vercel)
 
 Deploy `backend/` and `frontend/` as two separate Vercel projects from this repository:
-1. **Backend project:** Set Root Directory to `backend`, add all backend environment variables (`DATABASE_URL` using the Supabase Transaction Pooler on port `6543`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`, `FRONTEND_URL`, `VAT_RATE=0.18`, `CURRENCY=INR`, plus optional Stripe/SMTP/Google keys).
-2. **Frontend project:** Set Root Directory to `frontend`, add `NEXT_PUBLIC_API_URL` (pointing to your deployed backend URL) and `NEXT_PUBLIC_GOOGLE_CLIENT_ID`.
-3. Add your deployed frontend URL to `FRONTEND_URL` on the backend and to **Authorized JavaScript origins** in Google Cloud Console if using Google Sign-In.
+1. **Backend project:** Set Root Directory to `backend` and configure your Supabase, auth, payment, and mail settings in Vercel project settings.
+2. **Frontend project:** Set Root Directory to `frontend` and point it to your deployed backend URL.
