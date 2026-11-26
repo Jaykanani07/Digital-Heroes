@@ -213,17 +213,17 @@ export function Designer({ product, initial, onChange, csv, onCsvChange, allowFr
     e.stopPropagation();
     setSelectedId(el.id);
     if (el.locked) return;
-    (e.target as Element).setPointerCapture?.(e.pointerId);
+    svgRef.current?.setPointerCapture?.(e.pointerId);
     drag.current = { mode: "move", id: el.id, start: toMm(e), el, before: design, moved: false };
   };
   const startResize = (e: React.PointerEvent, el: DesignElement, sx: 1 | -1, sy: 1 | -1) => {
     e.stopPropagation();
-    (e.target as Element).setPointerCapture?.(e.pointerId);
+    svgRef.current?.setPointerCapture?.(e.pointerId);
     drag.current = { mode: "resize", id: el.id, el, sx, sy, keepRatio: el.type === "image" || e.shiftKey, before: design, moved: false };
   };
   const startRotate = (e: React.PointerEvent, el: DesignElement) => {
     e.stopPropagation();
-    (e.target as Element).setPointerCapture?.(e.pointerId);
+    svgRef.current?.setPointerCapture?.(e.pointerId);
     drag.current = { mode: "rotate", id: el.id, el, before: design, moved: false };
   };
 
@@ -426,7 +426,7 @@ export function Designer({ product, initial, onChange, csv, onCsvChange, allowFr
                 <rect x={selected.x} y={selected.y} width={selected.w} height={selected.h} fill="none" stroke="#141414" strokeWidth={line * 2} pointerEvents="none" />
                 {!selected.locked && (
                   <>
-                    <line x1={selected.x + selected.w / 2} y1={selected.y} x2={selected.x + selected.w / 2} y2={selected.y - hs * 1.6} stroke="#141414" strokeWidth={line * 2} />
+                    <line x1={selected.x + selected.w / 2} y1={selected.y} x2={selected.x + selected.w / 2} y2={selected.y - hs * 1.6} stroke="#141414" strokeWidth={line * 2} pointerEvents="none" />
                     <circle
                       cx={selected.x + selected.w / 2}
                       cy={selected.y - hs * 1.6}
@@ -434,23 +434,43 @@ export function Designer({ product, initial, onChange, csv, onCsvChange, allowFr
                       fill="#F2C230"
                       stroke="#141414"
                       strokeWidth={line * 2}
-                      className="cursor-grab"
+                      pointerEvents="none"
+                    />
+                    <circle
+                      cx={selected.x + selected.w / 2}
+                      cy={selected.y - hs * 1.6}
+                      r={hs * 1.4}
+                      fill="transparent"
+                      className="cursor-grab touch-none"
                       onPointerDown={(e) => startRotate(e, selected)}
                     />
-                    {([[-1, -1], [1, -1], [1, 1], [-1, 1]] as const).map(([sx, sy]) => (
-                      <rect
-                        key={`${sx}${sy}`}
-                        x={selected.x + (sx > 0 ? selected.w : 0) - hs / 2}
-                        y={selected.y + (sy > 0 ? selected.h : 0) - hs / 2}
-                        width={hs}
-                        height={hs}
-                        fill="#FFFFFF"
-                        stroke="#141414"
-                        strokeWidth={line * 2}
-                        className={sx === sy ? "cursor-nwse-resize" : "cursor-nesw-resize"}
-                        onPointerDown={(e) => startResize(e, selected, sx, sy)}
-                      />
-                    ))}
+                    {([[-1, -1], [1, -1], [1, 1], [-1, 1]] as const).map(([sx, sy]) => {
+                      const hx = selected.x + (sx > 0 ? selected.w : 0);
+                      const hy = selected.y + (sy > 0 ? selected.h : 0);
+                      return (
+                        <g key={`${sx}${sy}`}>
+                          <rect
+                            x={hx - hs / 2}
+                            y={hy - hs / 2}
+                            width={hs}
+                            height={hs}
+                            fill="#FFFFFF"
+                            stroke="#141414"
+                            strokeWidth={line * 2}
+                            pointerEvents="none"
+                          />
+                          <rect
+                            x={hx - hs * 1.4}
+                            y={hy - hs * 1.4}
+                            width={hs * 2.8}
+                            height={hs * 2.8}
+                            fill="transparent"
+                            className={cx(sx === sy ? "cursor-nwse-resize" : "cursor-nesw-resize", "touch-none")}
+                            onPointerDown={(e) => startResize(e, selected, sx, sy)}
+                          />
+                        </g>
+                      );
+                    })}
                   </>
                 )}
               </g>

@@ -18,28 +18,40 @@ export async function startCheckout(order: OrderRow, customerEmail: string): Pro
   if (paymentsMode === "test" || !stripe) return { mode: "test", url: null };
 
   const product = await getProduct(order.product_id);
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    customer_email: customerEmail,
-    client_reference_id: order.id,
-    metadata: { orderId: order.id, orderNumber: order.order_number },
-    payment_intent_data: { metadata: { orderId: order.id, orderNumber: order.order_number } },
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: order.currency.toLowerCase(),
-          unit_amount: order.total_pence,
-          product_data: {
-            name: `${product.name} × ${order.quantity} — ${order.order_number}`,
-            description: `${Math.round(order.config.widthMm)}×${Math.round(order.config.heightMm)} mm, ${order.config.material}. Total includes GST.`,
+  let session: Stripe.Checkout.Session;
+  try {
+    session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      customer_email: customerEmail,
+      client_reference_id: order.id,
+      metadata: { orderId: order.id, orderNumber: order.order_number },
+      payment_intent_data: { metadata: { orderId: order.id, orderNumber: order.order_number } },
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: order.currency.toLowerCase(),
+            unit_amount: order.total_pence,
+            product_data: {
+              name: `${product.name} × ${order.quantity} — ${order.order_number}`,
+              description: `${Math.round(order.config.widthMm)}×${Math.round(order.config.heightMm)} mm, ${order.config.material}. Total includes GST.`,
+            },
           },
         },
-      },
-    ],
-    success_url: `${siteUrl}/checkout/${order.id}?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl}/checkout/${order.id}?cancelled=1`,
-  });
+      ],
+      success_url: `${siteUrl}/checkout/${order.id}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/checkout/${order.id}?cancelled=1`,
+    });
+  } catch (err) {
+    const e = err as { type?: string; code?: string; message?: string };
+    if (e?.code === "amount_too_small" || /at least 50 cents/i.test(e?.message || "")) {
+      throw badRequest("Order total is below Stripe's minimum payment amount (~₹50 / $0.50). Increase quantity or size.");
+    }
+    if (e?.type === "StripeInvalidRequestError") {
+      throw badRequest(e.message || "Payment session could not be started.");
+    }
+    throw err;
+  }
   await query("update orders set stripe_session_id = $2 where id = $1", [order.id, session.id]);
   return { mode: "stripe", url: session.url };
 }
