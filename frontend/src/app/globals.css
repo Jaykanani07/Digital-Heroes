@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+/*
+ * Digital Heroes — "Workshop signage" direction.
+ * Concrete grey, ink black and one safety-yellow accent that drives every
+ * call to action. Square corners, hard 1.5px ink borders, condensed
+ * Darker Grotesque headings, Schibsted Grotesk for dense specs.
+ */
+@theme {
+  --color-concrete: #d7d8d3;
+  --color-concrete-dark: #c6c8c1;
+  --color-paper: #f4f4f1;
+  --color-ink: #141414;
+  --color-ink-soft: #2a2b28;
+  --color-steel: #5c5f58;
+  --color-steel-light: #8a8d85;
+  --color-signal: #f2c230;
+  --color-signal-dark: #d9a913;
+  --color-danger: #b3261e;
+  --color-danger-bg: #f6dcd9;
+  --color-ok: #2e6b3a;
+  --color-ok-bg: #d8e8d6;
+  --color-info: #1f4f8a;
+  --color-info-bg: #d9e3f0;
+  --color-trim: #e4007c;
+  --color-safe: #00a0e3;
+
+  --font-display: var(--font-darker), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
+
+  --radius-sm: 2px;
+
+  --ease-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-concrete);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    line-height: 0.86;
+  }
+  .label-caps {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .hazard {
+    background-image: repeating-linear-gradient(-45deg, var(--color-signal) 0 10px, var(--color-ink) 10px 20px);
+  }
+  .grid-lines {
+    background-image: linear-gradient(to right, rgb(20 20 20 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(20 20 20 / 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
