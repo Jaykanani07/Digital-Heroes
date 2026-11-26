@@ -12,12 +12,7 @@ approve it. The studio runs every job through a production console:
 | `frontend/` | Storefront, designer, customer account, admin console | Next.js 15 (App Router), React 19, Tailwind v4 |
 | `backend/` | REST API, pricing, rendering of proofs and print files | Node.js, Express 5, TypeScript, PostgreSQL (Supabase), Supabase Storage |
 
-More documentation:
-
-- [docs/DATABASE.md](docs/DATABASE.md): every table, column and relationship, plus who can access what
-- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): a new Supabase project and a new Vercel account, step by step
-- [docs/DECISIONS.md](docs/DECISIONS.md): choices made where the PRD left room, and known limits
-- The full database schema is [backend/supabase/schema.sql](backend/supabase/schema.sql)
+The full database schema is in [backend/supabase/schema.sql](backend/supabase/schema.sql).
 
 ---
 
@@ -142,7 +137,7 @@ frontend/
 - **Catalogue.** Six divisions and parameter-driven products: one product covers every size,
   material, orientation and quantity, with custom sizes inside admin-set limits.
 - **Live pricing.** Area-based unit price × material multiplier, automatic volume-discount tiers
-  (global or per product), VAT, and a "next tier" nudge. The calculator page needs no account.
+  (global or per product), GST, and a "next tier" nudge. The calculator page needs no account.
 - **Designer.** Templates scaled to the chosen size; text, shapes and images in millimetres;
   drag, resize and rotate; elements kept inside the safe area; text shrinks to fit; undo/redo;
   keyboard shortcuts; a server-rendered proof preview.
